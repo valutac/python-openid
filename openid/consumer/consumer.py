@@ -412,6 +412,7 @@ class Consumer(object):
         endpoint = self.session.get(self._token_key)
 
         message = Message.fromPostArgs(query)
+        endpoint.claimed_id = message.getArg(OPENID2_NS, 'claimed_id')
         response = self.consumer.complete(message, endpoint, current_url)
 
         try:
@@ -613,7 +614,6 @@ class GenericConsumer(object):
         OpenID message that is sent to the return_to URL.
         """
         mode = message.getArg(OPENID_NS, 'mode', '<No mode set>')
-
         modeMethod = getattr(self, '_complete_' + mode,
                              self._completeInvalid)
 
