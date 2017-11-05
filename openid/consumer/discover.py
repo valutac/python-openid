@@ -30,7 +30,8 @@ from openid.consumer import html_parse
 
 OPENID_1_0_NS = 'http://openid.net/xmlns/1.0'
 OPENID_IDP_2_0_TYPE = 'http://specs.openid.net/auth/2.0/server'
-OPENID_2_0_TYPE = 'http://specs.openid.net/auth/2.0/signon'
+#OPENID_2_0_TYPE = 'http://specs.openid.net/auth/2.0/signon'
+OPENID_2_0_TYPE = 'http://specs.openid.net/auth/2.0/server'
 OPENID_1_1_TYPE = 'http://openid.net/signon/1.1'
 OPENID_1_0_TYPE = 'http://openid.net/signon/1.0'
 
