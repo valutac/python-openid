@@ -146,6 +146,7 @@ class AttrInfo(object):
         """
         return self.count == UNLIMITED_VALUES
 
+
 def toTypeURIs(namespace_map, alias_list_s):
     """Given a namespace mapping and a string containing a
     comma-separated list of namespace aliases, return a list of type
@@ -405,6 +406,63 @@ class FetchRequest(AXMessage):
         return type_uri in self.requested_attributes
 
     __contains__ = has_key
+
+
+class CustomFetchRequest(FetchRequest):
+
+    ns_alias = 'alias3'
+
+    def getExtensionArgs(self):
+        """Get the serialized form of this attribute fetch request.
+
+        @returns: The fetch request message parameters
+        @rtype: {unicode:unicode}
+        """
+        aliases = NamespaceMap()
+
+        required = []
+        if_available = []
+
+        ax_args = self._newArgs()
+
+        for type_uri, attribute in self.requested_attributes.iteritems():
+            if attribute.alias is None:
+                alias = aliases.add(type_uri)
+            else:
+                # This will raise an exception when the second
+                # attribute with the same alias is added. I think it
+                # would be better to complain at the time that the
+                # attribute is added to this object so that the code
+                # that is adding it is identified in the stack trace,
+                # but it's more work to do so, and it won't be 100%
+                # accurate anyway, since the attributes are
+                # mutable. So for now, just live with the fact that
+                # we'll learn about the error later.
+                #
+                # The other possible approach is to hide the error and
+                # generate a new alias on the fly. I think that would
+                # probably be bad.
+                alias = aliases.addAlias(type_uri, attribute.alias)
+
+            if attribute.required:
+                required.append(alias)
+            else:
+                if_available.append(alias)
+
+            if attribute.count != 1:
+                ax_args['count.' + alias] = str(attribute.count)
+            else:
+                ax_args['count.' + alias] = 1
+
+            ax_args['type.' + alias] = type_uri
+
+        if required:
+            ax_args['required'] = ','.join(required)
+
+        if if_available:
+            ax_args['if_available'] = ','.join(if_available)
+
+        return ax_args
 
 
 class AXKeyValueMessage(AXMessage):
