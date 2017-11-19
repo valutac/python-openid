@@ -412,7 +412,11 @@ class Consumer(object):
         endpoint = self.session.get(self._token_key)
 
         message = Message.fromPostArgs(query)
-        #endpoint.claimed_id = message.getArg(OPENID2_NS, 'claimed_id')
+        try:
+            claimed_id = message.getArg(OPENID2_NS, 'claimed_id')
+            endpoint.claimed_id = claimed_id
+        except AttributeError:
+            pass
         response = self.consumer.complete(message, endpoint, current_url)
 
         try:
